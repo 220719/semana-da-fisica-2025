@@ -3,16 +3,6 @@ Cientista de Dados | PhD em Física | IA Aplicada a Dados Abertos e Saúde Públ
 
 Doutor em Física (UEM) com pós-doutorado na Lund University (Suécia). Atuo na interseção entre ciência de dados, inteligência artificial e engenharia aplicada. Coordeno o Centro de Inovação em Automação e Inteligência Artificial Curie-Turing (CNPq).
 
-Atualmente focado em **dados abertos e inteligência urbana** — construindo ferramentas que transformam dados públicos em decisões melhores para cidades brasileiras.
-
----
-
-### 🔭 Projeto Principal
-
-**[Observatório Dengue × Clima — Maringá](https://github.com/220719/observatorio-dengue-clima)**
-Sistema de previsão de dengue baseado em dados climáticos com modelos de ML. Cruza dados do InfoDengue, Open-Meteo e DATASUS para gerar projeções semanais com intervalo de confiança.
-
----
 
 ### 🛠️ Stack
 
@@ -22,6 +12,7 @@ Sistema de previsão de dengue baseado em dados climáticos com modelos de ML. C
 
 - Análise de dados abertos municipais e regionais
 - Modelos preditivos para saúde pública
+- Difração de raios X e nêutrons
 - Séries temporais e forecasting
 - Deep learning aplicado (visão computacional, NLP)
 - Automação de pipelines de dados
