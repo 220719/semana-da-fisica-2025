@@ -19,4 +19,5 @@ Doutor em Física (UEM) com pós-doutorado na Lund University (Suécia). Atuo na
 
 ### 📫 Contato
 
-[Lattes](https://lattes.cnpq.br/9526608938362113) · [ORCID](https://orcid.org/0000-0001-8528-8020) · fisicanuar@gmail.com · Maringá, PR
+[Lattes](https://lattes.cnpq.br/9526608938362113) · [ORCID](https://orcid.org/0000-0001-8528-8020) 
+
