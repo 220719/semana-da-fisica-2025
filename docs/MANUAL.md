@@ -124,7 +124,7 @@ Caminho mais prático — **não precisa clonar**:
 - Apresentação completa: https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html
 - Um HTML por módulo: https://220719.github.io/semana-da-fisica-2025/slides/index.html
 
-Se o Pages ainda não estiver ativo no repositório: GitHub → *Settings → Pages → Deploy from a branch* → `main` → `/ (root)`.
+Se o Pages ainda não estiver ativo (página **404**): abra [Settings → Pages](https://github.com/220719/semana-da-fisica-2025/settings/pages) → **Build and deployment** → Source **GitHub Actions**. O fluxo `pages.yml` publica sozinho a cada push na `main`. Aguarde 1–2 minutos e recarregue.
 
 Alternativa offline: ZIP do repositório e abrir `slides/apresentacao.html` no Chrome (precisa de internet para o CDN do Reveal.js).
 
