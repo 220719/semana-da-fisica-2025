@@ -30,7 +30,9 @@ def _src(text: str) -> list[str]:
 cells = []
 
 cells.append(md(r"""
-# MC1 — Inteligência Artificial Científica aplicada à Difração de Raios X
+# 🔬 IA Científica para Análise de Difração de Raios X
+
+**Subtítulo:** Construindo um Pipeline Híbrido com Machine Learning e LLMs
 
 **Ministrante:** Dr. Anuar José Mincache  
 **Afiliação:** Pós-doutorado em Física — Lund University (Suécia)  

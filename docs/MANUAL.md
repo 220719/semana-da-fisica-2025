@@ -1,4 +1,4 @@
-# Manual do minicurso — Semana da Física 2026
+# Manual — IA Científica para Análise de Difração de Raios X
 
 Este texto é o guia prático para **alunos** e para o **ministrante**. O conteúdo científico está no notebook e nos slides; aqui está o *como usar*.
 

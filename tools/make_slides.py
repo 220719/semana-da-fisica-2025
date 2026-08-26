@@ -21,7 +21,9 @@ CSS = """
 .reveal section { text-align: left; }
 .reveal ul { margin-left: 1.1em; }
 .reveal .center-title { text-align: center; }
-.reveal .center-title h1 { font-size: 2.1em; }
+.reveal .center-title h1 { font-size: 1.55em; line-height: 1.25; }
+.reveal .lede { color: var(--accent); font-size: 0.72em; font-weight: 600; margin-top: 0.4em; }
+.reveal .icons { font-size: 0.85em; letter-spacing: 0.04em; margin-bottom: 0.6em; }
 """
 
 REVEAL_HEAD = """<!DOCTYPE html>
@@ -334,7 +336,9 @@ INTRO = [
     sec(
         "<div class='center-title'>",
         "<p class='subtitle'>SEMANA DA FÍSICA 2026 · UEM</p>",
-        "<h1>IA científica aplicada<br>à difração de raios X</h1>",
+        "<p class='icons'>🔬 DRX &nbsp;·&nbsp; 📈 ML &nbsp;·&nbsp; 🤖 LLM</p>",
+        "<h1>IA Científica para Análise<br>de Difração de Raios X</h1>",
+        "<p class='lede'>Construindo um Pipeline Híbrido com Machine Learning e LLMs</p>",
         "<p>Dr. Anuar José Mincache<br>Pós-doutorado — Lund University</p>",
         "<p class='small'>Google Colab · dados reais de Bi<sub>1−x</sub>Nd<sub>x</sub>FeO<sub>3</sub></p>",
         "</div>",
@@ -358,7 +362,7 @@ INDEX = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Slides — Minicurso IA científica e DRX</title>
+<title>Slides — IA Científica para Análise de DRX</title>
 <link rel="stylesheet" href="assets/curso.css"/>
 <style>
 body { margin: 0; font-family: "Segoe UI", sans-serif; background: #f6f8fb; color: #1a1a1a; }
@@ -373,7 +377,8 @@ a { color: #0b3d5c; }
 </head>
 <body>
 <main>
-<h1>Slides do minicurso</h1>
+<h1>🔬 Slides do minicurso</h1>
+<p>IA Científica para Análise de Difração de Raios X: pipeline híbrido com ML e LLMs.</p>
 <p>Abra no navegador. Setas do teclado avançam os slides. F = tela cheia (Reveal.js).</p>
 <p><a class="cta" href="apresentacao.html">Abrir apresentação completa</a></p>
 <div class="card"><a href="01-ia-cientifica.html">Módulo 1 — IA científica</a><p>ML, DL, LLM e a regra de ouro do pipeline híbrido.</p></div>

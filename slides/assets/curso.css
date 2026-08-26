@@ -13,4 +13,6 @@
 .reveal section { text-align: left; }
 .reveal ul { margin-left: 1.1em; }
 .reveal .center-title { text-align: center; }
-.reveal .center-title h1 { font-size: 2.1em; }
+.reveal .center-title h1 { font-size: 1.55em; line-height: 1.25; }
+.reveal .lede { color: var(--accent); font-size: 0.72em; font-weight: 600; margin-top: 0.4em; }
+.reveal .icons { font-size: 0.85em; letter-spacing: 0.04em; margin-bottom: 0.6em; }

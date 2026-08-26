@@ -1,4 +1,9 @@
-# MC1 — Inteligência Artificial Científica aplicada à Difração de Raios X
+# 🔬 IA Científica para Análise de Difração de Raios X  
+### Construindo um Pipeline Híbrido com Machine Learning e LLMs
+
+| 🔬 DRX | 📈 Machine Learning | 🤖 LLMs |
+|---|---|---|
+| difratogramas reais | modelos verificáveis | copiloto de interpretação |
 
 > **Semana da Física 2026 — Universidade Estadual de Maringá (UEM)**  
 > Ministrante: **Dr. Anuar José Mincache** (Pós-doutorado em Física — Lund University, Suécia)
