@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Módulo 6 — LLM copiloto</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css"/>
+<link rel="stylesheet" href="assets/curso.css"/>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+<section>
+<p class='subtitle'>MÓDULO 6</p>
+<h1>LLM como copiloto</h1>
+<p>Texto depois dos números — nunca no lugar deles.</p>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>O que o LLM faz</h2>
+<ul>
+<li>Interpreta o JSON do pipeline.</li>
+<li>Explica R², MAE e RMSE <em>neste</em> experimento.</li>
+<li>Redige um relatório de minicurso.</li>
+</ul>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>O que o LLM não faz</h2>
+<ul>
+<li>Não mede 2θ.</li>
+<li>Não calcula FWHM nem Scherrer.</li>
+<li>Não inventa fases que não estejam no dossiê.</li>
+</ul>
+<p>Se não está no JSON, a resposta honesta é “não consta”.</p>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>Na prática (Colab)</h2>
+<ol>
+<li>Opcional: Secrets → <code>GEMINI_API_KEY</code>.</li>
+<li>Sem chave: relatório local determinístico (a aula não para).</li>
+<li>O aluno deve conferir se o texto bate com a tabela.</li>
+</ol>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/math/math.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: true,
+  width: 1280,
+  height: 720,
+  margin: 0.08,
+  plugins: [RevealMath.KaTeX]
+});
+</script>
+</body></html>

@@ -1,0 +1,16 @@
+
+:root { --uem: #0b3d5c; --accent: #c45c26; --ink: #1a1a1a; }
+.reveal { font-family: "Segoe UI", "Liberation Sans", sans-serif; }
+.reveal h1, .reveal h2, .reveal h3 { color: var(--uem); font-weight: 700; text-transform: none; }
+.reveal h1 { font-size: 1.85em; }
+.reveal h2 { font-size: 1.35em; }
+.reveal .subtitle { color: var(--accent); font-size: 0.7em; font-weight: 600; letter-spacing: 0.04em; }
+.reveal .small { font-size: 0.72em; }
+.reveal pre, .reveal code { font-size: 0.62em; }
+.reveal .flow { text-align: left; font-family: ui-monospace, Consolas, monospace; font-size: 0.62em; line-height: 1.35; background: #f4f7fa; padding: 0.8em 1em; border-left: 4px solid var(--accent); }
+.reveal table { font-size: 0.7em; }
+.reveal .footer { position: absolute; bottom: 18px; left: 24px; font-size: 0.38em; color: #666; }
+.reveal section { text-align: left; }
+.reveal ul { margin-left: 1.1em; }
+.reveal .center-title { text-align: center; }
+.reveal .center-title h1 { font-size: 2.1em; }

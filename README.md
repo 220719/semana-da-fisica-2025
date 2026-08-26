@@ -1,124 +1,82 @@
-# 📘 MC1 — Pipeline para Análise de Difração de Raios X com Python e Machine Learning
+# MC1 — Inteligência Artificial Científica aplicada à Difração de Raios X
 
-> **Semana de Física 2025 — Universidade Estadual de Maringá (UEM)**
+> **Semana de Física — Universidade Estadual de Maringá (UEM)**  
+> Ministrante: **Dr. Anuar José Mincache** (Pós-doutorado em Física — Lund University, Suécia)
 
-Mini-curso ministrado pelo **Dr. Anuar José Mincache** (Pós-doutorado em Física — Lund University, Suécia).
+Minicurso teórico-prático no **Google Colab**: pipeline verificável de DRX + Machine Learning + LLM como **copiloto** (interpretação e relatório). O modelo de linguagem **não substitui** a Física nem calcula 2θ, FWHM ou métricas.
 
----
+**Sistema:** $\mathrm{Bi}_{1-x}\mathrm{Nd}_{x}\mathrm{FeO}_{3}$, $x$ = 10% … 50%.
 
-## 📌 Sobre o Projeto
-
-Este repositório contém o material completo do mini-curso **MC1**, que apresenta a construção passo a passo de um pipeline para análise de padrões de **Difração de Raios X (DRX)** utilizando Python, Ciência de Dados e Machine Learning.
-
-O objetivo é demonstrar como transformar arquivos brutos de difração em **insights estruturais**, dados organizados e modelos preditivos.
-
-### Sistema Estudado
-
-Amostras de **Bi₁₋ₓNdₓFeO₃** (Bismuto Ferrita dopada com Neodímio), com concentrações de Nd variando entre **10% e 50%**.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/220719/semana-da-fisica-2025/blob/main/notebooks/Minicurso_IA_Cientifica_DRX.ipynb)
 
 ---
 
-## 📂 Estrutura do Repositório
+## Comece por aqui
+
+1. Abra o notebook no Colab pelo badge acima (CPU).
+2. *Ambiente de execução → Executar tudo*.
+3. Leia o [manual das ferramentas](docs/MANUAL.md) (Colab, clone, slides, chave do LLM).
+4. Slides: [slides/index.html](slides/index.html) (abra no navegador) ou a [apresentação completa](slides/apresentacao.html).
+
+Não é necessário instalar Python, montar Google Drive nem fazer upload dos CSV: o notebook lê a pasta `data/` ou baixa do GitHub.
+
+---
+
+## Módulos
+
+| # | Tema |
+|---|---|
+| 1 | O que é IA científica · ML × DL × LLM · pipeline híbrido |
+| 2 | Arquivos de DRX, leitura correta, waterfall e mapa de intensidade |
+| 3 | Savitzky–Golay, linha de base ALS, normalização |
+| 4 | Features com significado físico (picos, FWHM, Scherrer) |
+| 5 | Regressão, LOO, R² / MAE / RMSE, overfitting, dados sintéticos |
+| 6 | LLM como copiloto (Gemini/OpenAI opcional; fallback local) |
+| 7 | Função única: do CSV ao relatório |
+
+---
+
+## Estrutura
 
 ```
-├── notebooks/
-│   └── DRX_Analises.ipynb        # Notebook principal com todo o pipeline
-├── data/
-│   ├── Nd_10.csv                 # Difratograma — 10% Nd
-│   ├── Nd_20.csv                 # Difratograma — 20% Nd
-│   ├── Nd_30.csv                 # Difratograma — 30% Nd
-│   ├── Nd_40.csv                 # Difratograma — 40% Nd
-│   └── Nd_50.csv                 # Difratograma — 50% Nd
-├── docs/
-│   ├── Parte1.pdf                # Material de apoio — Parte 1
-│   └── Parte2.pdf                # Material de apoio — Parte 2
-├── requirements.txt              # Dependências do projeto
-├── LICENSE                       # Licença MIT
+├── notebooks/Minicurso_IA_Cientifica_DRX.ipynb
+├── data/Nd_10.csv … Nd_50.csv
+├── slides/          # Reveal.js, um HTML por módulo + apresentação
+├── docs/MANUAL.md
+├── tools/           # geradores do notebook e dos slides
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## 🔬 Conteúdo do Mini-Curso
-
-O notebook `DRX_Analises.ipynb` cobre as seguintes etapas:
-
-1. **Carregamento e visualização** dos dados de DRX
-2. **Detecção automática de picos** com `scipy.signal.find_peaks`
-3. **Visualização 3D** dos difratogramas comparativos
-4. **Análise estatística** — intensidade média, CV, barras de erro
-5. **Heatmaps e correlação** entre picos e dopagens
-6. **Tamanho de cristalito** — Equação de Scherrer e método de Williamson-Hall
-7. **Machine Learning aplicado**:
-   - Regressão Linear Simples
-   - KNN Regressor
-   - SVR (Support Vector Regression)
-   - Regressão Polinomial (grau 2)
-   - Random Forest Regressor
-8. **Data Augmentation** — geração de dados sintéticos para melhoria dos modelos
-
----
-
-## 🚀 Como Usar
-
-### Opção 1 — Google Colab (recomendado)
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/220719/anuarmincache/blob/main/notebooks/DRX_Analises.ipynb)
-
-1. Clique no badge acima para abrir no Google Colab
-2. Faça upload dos arquivos `.csv` da pasta `data/` ou monte seu Google Drive
-3. Execute as células sequencialmente
-
-### Opção 2 — Ambiente Local
+## Clone (alunos)
 
 ```bash
-git clone https://github.com/220719/anuarmincache.git
-cd anuarmincache
-pip install -r requirements.txt
-jupyter notebook notebooks/DRX_Analises.ipynb
+git clone https://github.com/220719/semana-da-fisica-2025.git
 ```
 
----
-
-## 📦 Dependências
-
-| Pacote | Uso |
-|--------|-----|
-| `pandas` | Manipulação de dados |
-| `numpy` | Cálculos numéricos |
-| `matplotlib` | Visualização de gráficos |
-| `seaborn` | Gráficos estatísticos |
-| `scipy` | Detecção de picos e análise de sinais |
-| `scikit-learn` | Modelos de Machine Learning |
+No Colab, o equivalente é uma célula `!git clone ...` — detalhes no manual.
 
 ---
 
-## 📊 Dados
+## Correções em relação à edição anterior
 
-Os arquivos CSV contêm duas colunas:
+- CSV **sem cabeçalho** (`header=None`): a versão antiga descartava o primeiro ponto.
+- Sem dependência de Google Drive.
+- Validação de ML por **Leave-One-Out** (com n = 5, split 80/20 não faz sentido).
+- Scherrer como estimativa didática; Williamson–Hall inconsistente da edição anterior ficou de fora do caminho principal.
+- Gráficos: paleta distinguível, waterfall, mapa 2θ × dopagem, FWHM desenhado na meia-altura.
+- LLM só interpreta um JSON produzido pelo pipeline.
 
-| Coluna | Descrição |
-|--------|-----------|
-| `2θ (°)` | Ângulo de difração |
-| `Intensidade (u.a.)` | Intensidade do sinal difratado |
-
----
-
-## 📄 Licença
-
-Este projeto está sob a licença [MIT](LICENSE).
+O notebook legado `notebooks/DRX_Analises.ipynb` (se presente) é histórico.
 
 ---
 
-## 👤 Autor
+## Licença
 
-**Dr. Anuar José Mincache**
+[MIT](LICENSE)
 
-- Pós-doutorado em Física — Lund University (Suécia)
-- Semana de Física 2025 — UEM
+## Autor
 
----
-
-## 🤝 Contribuições
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir uma *issue* ou enviar um *pull request*.
+**Dr. Anuar José Mincache** · Semana da Física · UEM

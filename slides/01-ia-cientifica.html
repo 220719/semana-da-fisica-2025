@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Módulo 1 — IA científica</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css"/>
+<link rel="stylesheet" href="assets/curso.css"/>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+<section>
+<p class='subtitle'>MÓDULO 1</p>
+<h1>Inteligência Artificial Científica</h1>
+<p>Como usar ML e LLMs <em>junto</em> com a Física — sem substituí-la.</p>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>O que é IA científica</h2>
+<ul>
+<li>Métodos computacionais acoplados a um problema <strong>físico</strong> bem definido.</li>
+<li>Há dados, unidades, hipóteses e <strong>limites de validade</strong>.</li>
+<li>Não é “pedir à IA para descobrir a estrutura”.</li>
+</ul>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>O que fazemos de fato</h2>
+<ol>
+<li>Pipeline <strong>reproduzível</strong>.</li>
+<li>Grandezas com significado físico (2θ, FWHM, cristalito…).</li>
+<li>ML só com pergunta preditiva clara.</li>
+<li>LLM para <strong>redigir e explicar</strong> o que já foi calculado.</li>
+</ol>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>ML × Deep Learning × LLM</h2>
+<table><thead><tr><th>Família</th><th>Papel aqui</th></tr></thead><tbody>
+<tr><td>Machine Learning</td><td>Prever % Nd a partir de features do DRX</td></tr>
+<tr><td>Deep Learning</td><td>Fora do escopo — só 5 amostras reais</td></tr>
+<tr><td>LLM</td><td>Interpretar métricas e escrever o relatório</td></tr>
+</tbody></table>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>Pipeline híbrido</h2>
+<div class='flow'>DRX → leitura → pré-processamento → features<br>→ ML → avaliação → LLM → relatório</div>
+<p>O LLM entra <strong>no fim</strong>, não no lugar do goniômetro.</p>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>Regra de ouro</h2>
+<ul>
+<li>O LLM <strong>não</strong> calcula 2θ, FWHM, R² nem Scherrer.</li>
+<li>Ele recebe um <strong>dossiê numérico</strong> do Python.</li>
+<li>Dossiê errado → relatório errado. O cientista responde pelos números.</li>
+</ul>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/math/math.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: true,
+  width: 1280,
+  height: 720,
+  margin: 0.08,
+  plugins: [RevealMath.KaTeX]
+});
+</script>
+</body></html>

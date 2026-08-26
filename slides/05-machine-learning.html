@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Módulo 5 — Machine Learning</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css"/>
+<link rel="stylesheet" href="assets/curso.css"/>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+<section>
+<p class='subtitle'>MÓDULO 5</p>
+<h1>Machine Learning: regressão</h1>
+<p>Pergunta: as features do DRX estimam a % de Nd?</p>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>Setup</h2>
+<ul>
+<li>y = nd_percent (10 … 50)</li>
+<li>X = tabela de características (sem o próprio y)</li>
+<li>Scaler: features em unidades diferentes (° vs nm vs u.a.)</li>
+</ul>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>Por que não 80/20?</h2>
+<p>Cinco amostras → o teste teria <strong>um</strong> ponto. Qualquer R² é loteria.</p>
+<p><strong>Leave-One-Out:</strong> treina em 4, testa na que ficou de fora, repete. Honesto — e costuma doer.</p>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>Métricas</h2>
+<ul>
+<li><strong>R²</strong> — no LOO pode ser negativo (pior que a média).</li>
+<li><strong>MAE</strong> — erro em pontos percentuais de Nd.</li>
+<li><strong>RMSE</strong> — penaliza erros grandes.</li>
+</ul>
+<p>Compare sempre <em>ajuste in-sample</em> vs LOO. A diferença é o overfitting.</p>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>Modelos na aula</h2>
+<ul>
+<li>Linear — hiperplano; p ≈ n é perigoso.</li>
+<li>Ridge — penalização ℓ₂, mais estável.</li>
+<li>Random Forest — flexível; com n = 5 memoriza.</li>
+</ul>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+<section>
+<h2>Dados sintéticos</h2>
+<p>Ruído nas 5 medidas <strong>aumenta n</strong> mas <strong>não cria física nova</strong>.</p>
+<p>Serve para ensinar o fluxo treino/teste. Não serve para paper.</p>
+<p class='footer'>MC1 · IA científica · DRX · UEM · Dr. Anuar J. Mincache</p>
+</section>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/math/math.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: true,
+  width: 1280,
+  height: 720,
+  margin: 0.08,
+  plugins: [RevealMath.KaTeX]
+});
+</script>
+</body></html>
