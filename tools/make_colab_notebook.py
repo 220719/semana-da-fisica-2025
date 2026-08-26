@@ -34,7 +34,7 @@ cells.append(md(r"""
 
 **Ministrante:** Dr. Anuar José Mincache  
 **Afiliação:** Pós-doutorado em Física — Lund University (Suécia)  
-**Evento:** Semana da Física — Universidade Estadual de Maringá (UEM)  
+**Evento:** Semana da Física 2026 — Universidade Estadual de Maringá (UEM)  
 **Formato:** aula teórico-prática · Google Colab · sem instalação local  
 
 **Sistema experimental:** $\mathrm{Bi}_{1-x}\mathrm{Nd}_{x}\mathrm{FeO}_{3}$ (ferrita de bismuto dopada com neodímio), $x$ entre 10% e 50%.
@@ -58,7 +58,7 @@ cells.append(md(r"""
 1. Badge **Open in Colab** no `README.md`, **ou** clone (veja `docs/MANUAL.md`).
 2. **CPU** basta. *Ambiente de execução → Executar tudo* (`Ctrl+F9`).
 3. Figuras também são gravadas em `figuras/` (na sessão do Colab: pasta à esquerda → download).
-4. Slides no navegador, sem instalar nada: [apresentação](https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html) (GitHub Pages).
+4. Slides no navegador: [apresentação completa](https://raw.githack.com/220719/semana-da-fisica-2025/main/slides/apresentacao.html) (não abra o `.html` na página de código do GitHub).
 5. **Módulo 6 (opcional):** Secrets → `GEMINI_API_KEY`. Sem chave, o relatório local já cobre a aula.
 
 Os CSV vêm de `data/` ou do GitHub. **Não é necessário montar o Google Drive.**
@@ -1452,7 +1452,7 @@ O minicurso percorreu:
 
 **Para levar para casa:** se o número não saiu de uma célula de cálculo, ele não entra no artigo — nem quando a frase do LLM estiver convincente.
 
-Material de apoio: [`docs/MANUAL.md`](../docs/MANUAL.md) e slides em https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html
+Material de apoio: [`docs/MANUAL.md`](../docs/MANUAL.md) e [slides no navegador](https://raw.githack.com/220719/semana-da-fisica-2025/main/slides/apresentacao.html).
 """))
 
 nb = {

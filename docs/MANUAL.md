@@ -1,4 +1,4 @@
-# Manual do minicurso — ferramentas e fluxo de trabalho
+# Manual do minicurso — Semana da Física 2026
 
 Este texto é o guia prático para **alunos** e para o **ministrante**. O conteúdo científico está no notebook e nos slides; aqui está o *como usar*.
 
@@ -8,7 +8,7 @@ Material:
 |---|---|
 | Aula prática | [`notebooks/Minicurso_IA_Cientifica_DRX.ipynb`](../notebooks/Minicurso_IA_Cientifica_DRX.ipynb) |
 | Slides (por módulo) | [`slides/index.html`](../slides/index.html) |
-| Apresentação (GitHub Pages) | https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html |
+| Apresentação (abrir no navegador) | [link direto](https://raw.githack.com/220719/semana-da-fisica-2025/main/slides/apresentacao.html) |
 | Difratogramas | [`data/Nd_10.csv`](../data/Nd_10.csv) … `Nd_50.csv` |
 
 Não é necessário instalar Python no computador. O caminho oficial da turma é o **Google Colab**.
@@ -119,18 +119,17 @@ Não envie os CSV para um LLM “para ele analisar o espectro”. O pipeline Pyt
 
 ## 5. Slides (Reveal.js)
 
-Caminho mais prático — **não precisa clonar**:
+**Não abra o `.html` na página do GitHub** (`github.com/.../blob/main/slides/...`). Isso mostra o *código-fonte*, não a apresentação.
 
-- Apresentação completa: https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html
-- Um HTML por módulo: https://220719.github.io/semana-da-fisica-2025/slides/index.html
+Use um destes caminhos:
 
-Se o Pages ainda não estiver ativo (página **404**): abra [Settings → Pages](https://github.com/220719/semana-da-fisica-2025/settings/pages) → **Build and deployment** → Source **GitHub Actions**. O fluxo `pages.yml` publica sozinho a cada push na `main`. Aguarde 1–2 minutos e recarregue.
-
-Alternativa offline: ZIP do repositório e abrir `slides/apresentacao.html` no Chrome (precisa de internet para o CDN do Reveal.js).
+1. **Link que já funciona no navegador** (recomendado para a turma):
+   - [Apresentação completa](https://raw.githack.com/220719/semana-da-fisica-2025/main/slides/apresentacao.html)
+   - [Índice por módulo](https://raw.githack.com/220719/semana-da-fisica-2025/main/slides/index.html)
+2. **No seu PC**, depois do clone: clique duas vezes em `slides/apresentacao.html` (precisa de internet para o Reveal.js).
+3. GitHub Pages (`220719.github.io/...`) só funciona depois de ligar Pages em Settings; o workflow ainda falha até isso estar ativo.
 
 Teclado: setas, `F` tela cheia, `Esc` visão geral.
-
-Os PDFs antigos em `docs/Parte1.pdf` e `docs/Parte2.pdf` (se existirem no clone) são da **edição anterior**.
 
 ---
 

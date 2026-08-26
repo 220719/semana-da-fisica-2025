@@ -1,24 +1,34 @@
 # MC1 — Inteligência Artificial Científica aplicada à Difração de Raios X
 
-> **Semana de Física — Universidade Estadual de Maringá (UEM)**  
+> **Semana da Física 2026 — Universidade Estadual de Maringá (UEM)**  
 > Ministrante: **Dr. Anuar José Mincache** (Pós-doutorado em Física — Lund University, Suécia)
 
 Minicurso teórico-prático no **Google Colab**: pipeline verificável de DRX + Machine Learning + LLM como **copiloto** (interpretação e relatório). O modelo de linguagem **não substitui** a Física nem calcula 2θ, FWHM ou métricas.
 
 **Sistema:** $\mathrm{Bi}_{1-x}\mathrm{Nd}_{x}\mathrm{FeO}_{3}$, $x$ = 10% … 50%.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/220719/semana-da-fisica-2025/blob/main/notebooks/Minicurso_IA_Cientifica_DRX.ipynb)
+---
+
+## Abrir agora
+
+| O quê | Clique aqui |
+|---|---|
+| **Slides (apresentação completa)** | [Abrir no navegador](https://raw.githack.com/220719/semana-da-fisica-2025/main/slides/apresentacao.html) |
+| **Slides por módulo** | [Índice](https://raw.githack.com/220719/semana-da-fisica-2025/main/slides/index.html) |
+| **Notebook da aula** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/220719/semana-da-fisica-2025/blob/main/notebooks/Minicurso_IA_Cientifica_DRX.ipynb) |
+| Manual | [docs/MANUAL.md](docs/MANUAL.md) |
+
+Não abra os arquivos `.html` na página de código do GitHub (`blob/main/slides/...`): isso mostra o fonte, não o slideshow. Use os links da tabela.
+
+Setas do teclado avançam os slides; `F` é tela cheia.
 
 ---
 
-## Comece por aqui
+## Comece por aqui (aula)
 
 1. Abra o notebook no Colab pelo badge acima (CPU).
 2. *Ambiente de execução → Executar tudo*.
-3. Leia o [manual das ferramentas](docs/MANUAL.md) (Colab, clone, slides, chave do LLM).
-4. Slides no navegador (sem baixar ZIP): [apresentação](https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html) · [índice](https://220719.github.io/semana-da-fisica-2025/slides/index.html)
-
-Não é necessário instalar Python, montar Google Drive nem fazer upload dos CSV: o notebook lê a pasta `data/` ou baixa do GitHub.
+3. Os CSV são lidos de `data/` ou baixados do GitHub. Não precisa montar o Drive nem instalar Python.
 
 ---
 
@@ -56,6 +66,8 @@ Não é necessário instalar Python, montar Google Drive nem fazer upload dos CS
 git clone https://github.com/220719/semana-da-fisica-2025.git
 ```
 
+O nome da pasta no GitHub continua `semana-da-fisica-2025` (histórico do repositório). O minicurso é da **Semana da Física 2026**.
+
 No Colab, o equivalente é uma célula `!git clone ...` — detalhes no manual.
 
 ---
@@ -79,4 +91,4 @@ O notebook legado `notebooks/DRX_Analises.ipynb` (se presente) é histórico.
 
 ## Autor
 
-**Dr. Anuar José Mincache** · Semana da Física · UEM
+**Dr. Anuar José Mincache** · Semana da Física 2026 · UEM
