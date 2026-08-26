@@ -46,8 +46,8 @@ Este notebook é o material **reformulado** do minicurso. Os cálculos científi
 | 1 | O que é IA científica, ML × DL × LLM, pipeline híbrido |
 | 2 | Dados reais de DRX: arquivos, leitura, visualização |
 | 3 | Pré-processamento: ruído, linha de base, normalização |
-| 4 | Feature engineering com significado físico |
-| 5 | Regressão, métricas, overfitting e dados sintéticos |
+| 4 | Features, catálogo de picos, Scherrer, Williamson–Hall (D e strain) |
+| 5 | Pelo menos 3 modelos de regressão, métricas, overfitting |
 | 6 | LLM como copiloto (interpretação e relatório) |
 | 7 | Pipeline híbrido completo, do CSV ao relatório |
 """))
@@ -55,12 +55,13 @@ Este notebook é o material **reformulado** do minicurso. Os cálculos científi
 cells.append(md(r"""
 ## Como usar no Google Colab
 
-1. Abra este arquivo no Colab pelo badge do `README.md`, **ou** clone o repositório (veja o `docs/MANUAL.md`).
-2. Em **Ambiente de execução → Alterar o tipo de ambiente de execução**, **CPU** é suficiente. GPU não acelera este pipeline.
-3. Execute as células **em ordem** (Runtime → Executar tudo, ou `Ctrl+F9`).
-4. **Módulo 6 (opcional):** em 🔑 *Secrets* do Colab, cadastre `GEMINI_API_KEY`. Sem chave, o notebook ainda gera um relatório estruturado a partir dos números calculados.
+1. Badge **Open in Colab** no `README.md`, **ou** clone (veja `docs/MANUAL.md`).
+2. **CPU** basta. *Ambiente de execução → Executar tudo* (`Ctrl+F9`).
+3. Figuras também são gravadas em `figuras/` (na sessão do Colab: pasta à esquerda → download).
+4. Slides no navegador, sem instalar nada: [apresentação](https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html) (GitHub Pages).
+5. **Módulo 6 (opcional):** Secrets → `GEMINI_API_KEY`. Sem chave, o relatório local já cobre a aula.
 
-Os difratogramas são lidos da pasta `data/` se ela existir; senão, são baixados automaticamente do GitHub. **Não é necessário montar o Google Drive.**
+Os CSV vêm de `data/` ou do GitHub. **Não é necessário montar o Google Drive.**
 """))
 
 cells.append(md(r"""
@@ -147,12 +148,16 @@ from matplotlib.ticker import AutoMinorLocator
 from scipy.signal import find_peaks, peak_widths, savgol_filter
 from scipy import sparse
 from scipy.sparse.linalg import spsolve
+from scipy.stats import linregress, pearsonr
 from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import LeaveOneOut, cross_val_predict, train_test_split
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
+import seaborn as sns
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -182,7 +187,18 @@ plt.rcParams.update({
     "axes.prop_cycle": plt.cycler(color=list(PALETTE.values())),
 })
 
-print("Ambiente pronto. CPU é suficiente para este minicurso.")
+FIG_DIR = Path("figuras")
+FIG_DIR.mkdir(exist_ok=True)
+
+
+def show_and_save(fig, name: str):
+    '''Grava PNG em figuras/ e mostra na célula (Colab e local).'''
+    fig.savefig(FIG_DIR / name, dpi=150, bbox_inches="tight")
+    plt.show()
+    plt.close(fig)
+
+
+print("Ambiente pronto. Figuras →", FIG_DIR.resolve())
 """))
 
 cells.append(md(r"""
@@ -269,7 +285,64 @@ patterns[10].head()
 """))
 
 cells.append(md(r"""
-## 2.3 Visualização
+## 2.4 Estatística descritiva dos arquivos
+
+Antes de “olhar o gráfico bonito”, medimos o que cada CSV contém: número de pontos, passo angular, média/mediana/desvio da intensidade e coeficiente de variação (CV = desvio/média). O CV alto em DRX de pó é normal: a maior parte do padrão é fundo; a energia está nos picos.
+"""))
+
+cells.append(code(r"""
+rows = []
+for d, df in patterns.items():
+    y = df.intensity.to_numpy(dtype=float)
+    rows.append({
+        "Nd_%": d,
+        "n": len(df),
+        "passo_deg": float(np.median(np.diff(df.two_theta))),
+        "I_min": float(y.min()),
+        "I_mediana": float(np.median(y)),
+        "I_media": float(y.mean()),
+        "I_max": float(y.max()),
+        "I_std": float(y.std(ddof=1)),
+        "CV": float(y.std(ddof=1) / y.mean()),
+        "I_p95": float(np.percentile(y, 95)),
+    })
+stats_raw = pd.DataFrame(rows).set_index("Nd_%")
+stats_raw.round(3)
+"""))
+
+cells.append(code(r"""
+fig, axes = plt.subplots(1, 3, figsize=(13.2, 4.0))
+axes[0].bar(stats_raw.index.astype(str), stats_raw.I_max, color=[PALETTE[d] for d in DOPINGS])
+axes[0].set_title("Intensidade máxima")
+axes[0].set_ylabel("I máx (u.a.)")
+axes[1].bar(stats_raw.index.astype(str), stats_raw.I_media, color=[PALETTE[d] for d in DOPINGS])
+axes[1].set_title("Intensidade média (inclui fundo)")
+axes[2].bar(stats_raw.index.astype(str), stats_raw.CV, color=[PALETTE[d] for d in DOPINGS])
+axes[2].set_title("CV da intensidade")
+for ax in axes:
+    ax.set_xlabel("Nd (%)")
+fig.suptitle("Comparação estatística entre amostras (sinal bruto)", y=1.03)
+fig.tight_layout()
+show_and_save(fig, "02_stats_barras.png")
+"""))
+
+cells.append(code(r"""
+# Histogramas: o fundo concentra a massa; a cauda direita são os picos.
+fig, axes = plt.subplots(1, 5, figsize=(14.5, 3.2), sharey=True)
+for ax, d in zip(axes, DOPINGS):
+    y = patterns[d].intensity
+    ax.hist(y, bins=40, color=PALETTE[d], edgecolor="white", lw=0.3)
+    ax.axvline(y.median(), color="#333", ls="--", lw=1)
+    ax.set_title(f"{d}% Nd")
+    ax.set_xlabel("I (u.a.)")
+axes[0].set_ylabel("contagens")
+fig.suptitle("Distribuição das intensidades (linha tracejada = mediana)", y=1.05)
+fig.tight_layout()
+show_and_save(fig, "02_hist_intensidade.png")
+"""))
+
+cells.append(md(r"""
+## Visualização
 
 Um único difratograma é a “impressão digital” cristalina da amostra. Em seguida comparamos as cinco dopagens com um **waterfall** (deslocamento vertical): em aula isso é mais legível que um gráfico 3D. O 3D fica como complemento. Por fim, um **mapa de intensidade** (2θ × dopagem) ajuda a ver se picos caminham com $x$.
 """))
@@ -289,7 +362,7 @@ def plot_single_pattern(df: pd.DataFrame, doping: int, ax=None):
 fig, ax = plt.subplots(figsize=(10, 4.2))
 plot_single_pattern(patterns[10], 10, ax)
 fig.tight_layout()
-plt.show()
+show_and_save(fig, "02_padrao_nd10.png")
 """))
 
 cells.append(code(r"""
@@ -315,7 +388,7 @@ def plot_waterfall(patterns: dict, offset: float | None = None):
 
 
 plot_waterfall(patterns)
-plt.show()
+show_and_save(plt.gcf(), "02_waterfall.png")
 """))
 
 cells.append(code(r"""
@@ -344,7 +417,7 @@ ax.set_title("Mapa de intensidade normalizada (cada linha = uma amostra)")
 cbar = fig.colorbar(im, ax=ax, pad=0.02)
 cbar.set_label(r"$I / I_{\mathrm{max}}$")
 fig.tight_layout()
-plt.show()
+show_and_save(fig, "02_mapa_intensidade.png")
 """))
 
 cells.append(code(r"""
@@ -365,7 +438,53 @@ ax.set_title("Visão 3D complementar — a mesma informação do waterfall")
 ax.view_init(elev=22, azim=-60)
 ax.legend(loc="upper left")
 plt.tight_layout()
-plt.show()
+show_and_save(fig, "02_visao_3d.png")
+"""))
+
+cells.append(code(r"""
+# Grade comum de 2θ: permite correlacionar amostras de mesmo comprimento.
+theta_c = np.linspace(10, 80, 2000)
+mat = np.vstack([
+    np.interp(theta_c, patterns[d].two_theta, patterns[d].intensity / patterns[d].intensity.max())
+    for d in DOPINGS
+])
+corr = pd.DataFrame(mat.T, columns=[f"{d}%" for d in DOPINGS]).corr()
+
+fig, axes = plt.subplots(1, 2, figsize=(12.4, 4.8))
+sns.heatmap(corr, annot=True, fmt=".3f", cmap="vlag", vmin=0.7, vmax=1, ax=axes[0], square=True)
+axes[0].set_title("Correlação de Pearson entre padrões (I/Imax)")
+# RMSE par a par: “quão diferentes” são dois difratogramas na grade comum
+rmse = np.zeros((5, 5))
+for i in range(5):
+    for j in range(5):
+        rmse[i, j] = np.sqrt(np.mean((mat[i] - mat[j]) ** 2))
+sns.heatmap(
+    pd.DataFrame(rmse, index=[f"{d}%" for d in DOPINGS], columns=[f"{d}%" for d in DOPINGS]),
+    annot=True, fmt=".3f", cmap="YlGnBu_r", ax=axes[1], square=True,
+)
+axes[1].set_title("RMSE entre padrões normalizados")
+fig.tight_layout()
+show_and_save(fig, "02_corr_rmse.png")
+print("Correlação média (off-diagonal):",
+      float(corr.values[np.triu_indices(5, 1)].mean()))
+"""))
+
+cells.append(code(r"""
+# “Registros extras” só para visualização: mistura linear entre dopagens vizinhas.
+# Não são amostras novas. Mostram a tendência contínua no mapa 2θ × x.
+fig, ax = plt.subplots(figsize=(10.5, 4.4))
+for d in DOPINGS:
+    ax.plot(theta_c, mat[DOPINGS.index(d)], color=PALETTE[d], lw=1.4, label=f"{d}% (real)")
+for i, (a, b) in enumerate(zip(DOPINGS[:-1], DOPINGS[1:])):
+    for w, ls in ((0.35, ":"), (0.65, ":")):
+        ymix = (1 - w) * mat[DOPINGS.index(a)] + w * mat[DOPINGS.index(b)]
+        ax.plot(theta_c, ymix, color="#999999", lw=0.7, ls=ls, alpha=0.85)
+ax.set_xlabel(r"$2\theta$ (°)")
+ax.set_ylabel(r"$I / I_{\mathrm{max}}$")
+ax.set_title("Padrões reais + interpolações (pontilhado) entre vizinhos")
+ax.legend(ncol=5, loc="upper right")
+fig.tight_layout()
+show_and_save(fig, "02_interpolacao_vizinhos.png")
 """))
 
 cells.append(md(r"""
@@ -406,7 +525,7 @@ def baseline_als(y: np.ndarray, lam: float = 1e5, p: float = 0.001, niter: int =
     y = np.asarray(y, dtype=float)
     n = y.size
     # operador de 2ª diferença: penaliza curvatura (base “quase reta/lenta”)
-    d2 = sparse.diags([1, -2, 1], [0, 1, 2], shape=(n - 2, n))
+    d2 = sparse.diags([1.0, -2.0, 1.0], [0, 1, 2], shape=(n - 2, n), dtype=float)
     w = np.ones(n)
     z = y.copy()
     for _ in range(niter):
@@ -464,10 +583,8 @@ axes[1].plot(df.two_theta, df.normalized, color=PALETTE[d_show], lw=1.2)
 axes[1].set_title("Após correção e normalização")
 axes[1].set_ylabel(r"$I / I_{\mathrm{max}}$")
 
-for ax in axes:
-    ax.set_xlabel(r"$2\theta$ (°)")
 fig.tight_layout()
-plt.show()
+show_and_save(fig, "03_baseline_nd10.png")
 """))
 
 cells.append(code(r"""
@@ -479,7 +596,44 @@ ax.set_ylabel("Intensidade normalizada")
 ax.set_title("Comparação das cinco concentrações (padrões pré-processados)")
 ax.legend(ncol=5, loc="upper right")
 fig.tight_layout()
-plt.show()
+show_and_save(fig, "03_overlay_normalizado.png")
+"""))
+
+cells.append(code(r"""
+# Painel 5 amostras + zoom no pico mais intenso (~32°) + resíduo (bruto − suave)
+fig, axes = plt.subplots(2, 3, figsize=(13.5, 7.0))
+flat = axes.ravel()
+for ax, d in zip(flat[:5], DOPINGS):
+    df = processed[d]
+    ax.plot(df.two_theta, df.normalized, color=PALETTE[d], lw=0.9)
+    ax.set_title(f"{d}% Nd")
+    ax.set_xlabel(r"$2\theta$ (°)")
+    ax.set_ylabel(r"$I/I_{\mathrm{max}}$")
+flat[5].axis("off")
+fig.suptitle("Padrões pré-processados, uma amostra por painel")
+fig.tight_layout()
+show_and_save(fig, "03_painel_cinco.png")
+"""))
+
+cells.append(code(r"""
+fig, axes = plt.subplots(1, 2, figsize=(12.6, 4.3))
+for d, df in processed.items():
+    m = (df.two_theta >= 30) & (df.two_theta <= 34)
+    axes[0].plot(df.two_theta[m], df.normalized[m], color=PALETTE[d], lw=1.3, label=f"{d}%")
+axes[0].set_title("Zoom 30–34° (região do pico principal)")
+axes[0].set_xlabel(r"$2\theta$ (°)")
+axes[0].set_ylabel(r"$I/I_{\mathrm{max}}$")
+axes[0].legend()
+
+d0 = 10
+df0 = processed[d0]
+resid = df0.intensity - df0.smooth
+axes[1].plot(df0.two_theta, resid, color=PALETTE[d0], lw=0.6)
+axes[1].set_title(f"Resíduo bruto − Savitzky–Golay ({d0}% Nd)")
+axes[1].set_xlabel(r"$2\theta$ (°)")
+axes[1].set_ylabel("I (u.a.)")
+fig.tight_layout()
+show_and_save(fig, "03_zoom_residuo.png")
 """))
 
 cells.append(md(r"""
@@ -507,22 +661,31 @@ $$
 
 com $K \approx 0{,}9$, $\lambda = 1{,}5406\,\text{Å}$ (Cu Kα), $\beta$ = FWHM em **radianos**, $\theta$ = metade de $2\theta$ do pico.
 
-Scherrer **não** separa alargamento instrumental nem microdeformação. Na edição anterior, o Williamson–Hall lia arquivos `.asc` de outro caminho e estimava $\beta$ de forma inconsistente (tamanhos $\sim 0{,}1\,\mathrm{nm}$). Aqui Scherrer é **estimativa didática**; WH completo fica como extensão fora da aula.
+Scherrer **não** separa alargamento instrumental nem microdeformação.
+
+## Williamson–Hall (tamanho + strain)
+
+O alargamento observado de cada pico, $\beta$ (FWHM em radianos), no modelo uniforme de deformação (UDM) escreve-se
+
+$$
+\beta\cos\theta = \frac{K\lambda}{D} + 4\varepsilon\sin\theta.
+$$
+
+- intercepto $\Rightarrow D$ (cristalito aparente);
+- declive $\Rightarrow \varepsilon$ (microdeformação adimensional).
+
+**Limite honesto:** não temos padrão de Si/LaB₆ neste minicurso, então **não subtraímos $\beta_{\mathrm{inst}}$**. $D$ e $\varepsilon$ são *aparentes* (incluem o instrumento). Na edição anterior o WH usava $\beta$ a partir da derivada da intensidade — isso gerava $D\sim 0{,}1\,\mathrm{nm}$, fisicamente absurdo. Aqui $\beta$ vem do FWHM de cada pico.
+
+Cada pico vira um **registro** na tabela longa (`peak_catalog`): é o “maior número de pontos” que estes 5 CSV permitem sem inventar amostras.
 """))
 
 cells.append(code(r"""
 K_SCHERRER = 0.9
-LAMBDA_ANGSTROM = 1.5406  # Cu Kα. D sai em Å e convertemos para nm.
+LAMBDA_ANGSTROM = 1.5406  # Cu Kα. D em Å; dividimos por 10 → nm.
 
 
 def detect_peaks(two_theta, y, height_frac=0.12, prominence_frac=0.05, min_deg=0.8):
-    '''Picos no padrao normalizado.
-
-    height_frac     -> ignora oscilacoes baixas (ruido residual)
-    prominence_frac -> o pico precisa saltar em relacao aos vizinhos
-    min_deg         -> distancia minima entre picos, convertida em indices via d(2theta)
-    FWHM            -> peak_widths em meia-altura, convertido de indices para graus
-    '''
+    '''Picos no padrao normalizado; FWHM via peak_widths (meia-altura).'''
     two_theta = np.asarray(two_theta, dtype=float)
     y = np.asarray(y, dtype=float)
     dx = np.median(np.diff(two_theta))
@@ -541,13 +704,50 @@ def detect_peaks(two_theta, y, height_frac=0.12, prominence_frac=0.05, min_deg=0
 
 
 def scherrer_nm(two_theta_deg: float, fwhm_deg: float) -> float:
-    '''D em nanometros. two_theta_deg e o 2theta do pico, nao theta.'''
+    '''D em nm. two_theta_deg e o 2theta do pico, nao theta.'''
     theta_rad = np.radians(two_theta_deg / 2.0)
     beta_rad = np.radians(fwhm_deg)
     if beta_rad <= 0 or np.cos(theta_rad) == 0:
         return np.nan
     d_angstrom = (K_SCHERRER * LAMBDA_ANGSTROM) / (beta_rad * np.cos(theta_rad))
-    return d_angstrom / 10.0  # Å → nm
+    return d_angstrom / 10.0
+
+
+def d_hkl_angstrom(two_theta_deg: float) -> float:
+    '''d_hkl = lambda / (2 sin theta), lei de Bragg n=1.'''
+    s = np.sin(np.radians(two_theta_deg / 2.0))
+    return np.nan if s == 0 else LAMBDA_ANGSTROM / (2.0 * s)
+
+
+def williamson_hall(two_theta_deg, fwhm_deg, min_peaks=3):
+    '''Regressao linear: y = beta cos theta  vs  x = 4 sin theta.
+
+    Devolve None se poucos picos ou intercepto nao positivo (D indefinido).
+    '''
+    tt = np.asarray(two_theta_deg, dtype=float)
+    fw = np.asarray(fwhm_deg, dtype=float)
+    ok = (fw > 0.06) & (fw < 1.2) & (tt > 18) & (tt < 75)
+    tt, fw = tt[ok], fw[ok]
+    if len(tt) < min_peaks:
+        return None
+    theta = np.radians(tt / 2.0)
+    beta = np.radians(fw)
+    x = 4.0 * np.sin(theta)
+    y = beta * np.cos(theta)
+    fit = linregress(x, y)
+    intercept, slope = fit.intercept, fit.slope
+    d_nm = np.nan
+    if intercept > 0:
+        d_nm = (K_SCHERRER * LAMBDA_ANGSTROM / intercept) / 10.0
+    return {
+        "x": x, "y": y, "tt": tt, "fw": fw,
+        "strain": float(slope),
+        "D_nm": float(d_nm) if d_nm == d_nm else np.nan,
+        "intercept": float(intercept),
+        "r": float(fit.rvalue),
+        "p": float(fit.pvalue),
+        "n": int(len(x)),
+    }
 
 
 def extract_features(doping: int, df: pd.DataFrame) -> dict:
@@ -561,11 +761,13 @@ def extract_features(doping: int, df: pd.DataFrame) -> dict:
     centroid = float(trap(x * y_corr, x) / area) if area else np.nan
     main_fwhm = np.nan
     d_sch = np.nan
+    d_mean = np.nan
     if len(peaks):
-        j = int(np.argmax(y_n[peaks]))  # pico de maior I normalizada
+        j = int(np.argmax(y_n[peaks]))
         main_fwhm = float(fwhm[j])
         d_sch = float(scherrer_nm(x[peaks[j]], main_fwhm))
-
+        d_mean = float(np.nanmean([scherrer_nm(x[p], w) for p, w in zip(peaks, fwhm)]))
+    wh = williamson_hall(x[peaks], fwhm) if len(peaks) else None
     return {
         "nd_percent": doping,
         "n_points": int(len(df)),
@@ -579,6 +781,11 @@ def extract_features(doping: int, df: pd.DataFrame) -> dict:
         "std_norm": float(y_n.std()),
         "skew_norm": float(((y_n - y_n.mean()) ** 3).mean() / (y_n.std() ** 3 + 1e-12)),
         "scherrer_D_nm": d_sch,
+        "scherrer_D_mean_nm": d_mean,
+        "wh_D_nm": np.nan if wh is None else wh["D_nm"],
+        "wh_strain": np.nan if wh is None else wh["strain"],
+        "wh_r": np.nan if wh is None else wh["r"],
+        "wh_n": 0 if wh is None else wh["n"],
         "peak_positions": x[peaks].tolist() if len(peaks) else [],
         "peak_fwhm_deg": fwhm.tolist() if len(peaks) else [],
     }
@@ -590,13 +797,37 @@ feature_view.round(3)
 """))
 
 cells.append(code(r"""
+# Catálogo longo: um registro por pico (o que a edição antiga fazia com df_peaks).
+records = []
+wh_fits = {}
+for d in DOPINGS:
+    df = processed[d]
+    x = df.two_theta.to_numpy()
+    y = df.normalized.to_numpy()
+    peaks, fwhm = detect_peaks(x, y)
+    wh_fits[d] = williamson_hall(x[peaks], fwhm) if len(peaks) else None
+    for k, (p, w) in enumerate(zip(peaks, fwhm), start=1):
+        records.append({
+            "nd_percent": d,
+            "peak_id": k,
+            "two_theta_deg": float(x[p]),
+            "I_norm": float(y[p]),
+            "fwhm_deg": float(w),
+            "d_hkl_A": float(d_hkl_angstrom(x[p])),
+            "scherrer_D_nm": float(scherrer_nm(x[p], w)),
+        })
+peak_catalog = pd.DataFrame(records)
+print(f"{len(peak_catalog)} registros de pico  |  {peak_catalog.nd_percent.nunique()} amostras")
+peak_catalog.head(12)
+"""))
+
+cells.append(code(r"""
 d_show = 10
 df = processed[d_show]
 x = df.two_theta.to_numpy()
 y = df.normalized.to_numpy()
 peaks, fwhm = detect_peaks(x, y)
 meta = features.loc[features.nd_percent == d_show].iloc[0]
-# coordenadas da meia-altura (para desenhar o FWHM como um segmento)
 _, _, left_ips, right_ips = peak_widths(y, peaks, rel_height=0.5)
 dx = np.median(np.diff(x))
 left_deg = x[0] + left_ips * dx
@@ -606,46 +837,129 @@ fig, ax = plt.subplots(figsize=(10.5, 4.6))
 ax.plot(x, y, color=PALETTE[d_show], lw=1.15, label="Padrão normalizado")
 ax.scatter(x[peaks], y[peaks], c="#D55E00", s=40, zorder=3, label="Picos")
 for i, p in enumerate(peaks):
-    half = y[p] * 0.5
-    ax.hlines(half, left_deg[i], right_deg[i], colors="#D55E00", lw=1.4, alpha=0.85)
+    ax.hlines(y[p] * 0.5, left_deg[i], right_deg[i], colors="#D55E00", lw=1.4, alpha=0.85)
     ax.annotate(
         f"{x[p]:.1f}°\nFWHM {fwhm[i]:.2f}°",
         (x[p], y[p]),
-        textcoords="offset points",
-        xytext=(4, 8),
-        fontsize=8,
-        color="#333333",
+        textcoords="offset points", xytext=(4, 8), fontsize=8, color="#333333",
     )
 ax.set_xlabel(r"$2\theta$ (°)")
 ax.set_ylabel(r"$I / I_{\mathrm{max}}$")
 ax.set_title(
     f"Picos em {d_show}% Nd  ·  máximo em {meta.two_theta_max:.2f}°  ·  "
-    f"D(Scherrer) ≈ {meta.scherrer_D_nm:.1f} nm"
+    f"D(Scherrer pico) ≈ {meta.scherrer_D_nm:.1f} nm"
 )
 ax.legend()
 fig.tight_layout()
-plt.show()
+show_and_save(fig, "04_picos_nd10.png")
 """))
 
 cells.append(code(r"""
-fig, axes = plt.subplots(1, 3, figsize=(12.8, 4.0))
+fig, axes = plt.subplots(2, 3, figsize=(13.2, 7.2))
 pairs = [
-    ("n_peaks", "Número de picos"),
-    ("fwhm_main_deg", "FWHM do pico principal (°)"),
-    ("scherrer_D_nm", "D Scherrer (nm)"),
+    ("n_peaks", "Nº de picos"),
+    ("fwhm_main_deg", "FWHM principal (°)"),
+    ("scherrer_D_nm", "D Scherrer (pico máx., nm)"),
+    ("scherrer_D_mean_nm", "D Scherrer (média dos picos, nm)"),
+    ("wh_D_nm", "D Williamson–Hall (nm)"),
+    ("wh_strain", r"strain $\varepsilon$ (WH)"),
 ]
-for ax, (col, ylab) in zip(axes, pairs):
+for ax, (col, ylab) in zip(axes.ravel(), pairs):
     ax.plot(features.nd_percent, features[col], marker="o", color="#0072B2", lw=1.6)
     ax.set_xlabel("Nd (%)")
     ax.set_ylabel(ylab)
     ax.set_xticks(DOPINGS)
-fig.suptitle("Características vs. dopagem — o que o modelo poderá usar", y=1.03)
+fig.suptitle("Características vs. dopagem (incluindo cristalito e strain)", y=1.01)
 fig.tight_layout()
-plt.show()
+show_and_save(fig, "04_features_vs_nd.png")
+"""))
+
+cells.append(code(r"""
+pal = [PALETTE[d] for d in DOPINGS]
+fig, axes = plt.subplots(1, 2, figsize=(12.4, 4.6))
+sns.boxplot(data=peak_catalog, x="nd_percent", y="fwhm_deg", order=DOPINGS, palette=pal, ax=axes[0])
+axes[0].set_xlabel("Nd (%)")
+axes[0].set_ylabel("FWHM (°)")
+axes[0].set_title("FWHM de todos os picos detectados")
+sns.violinplot(data=peak_catalog, x="nd_percent", y="I_norm", order=DOPINGS, palette=pal, ax=axes[1], cut=0)
+axes[1].set_xlabel("Nd (%)")
+axes[1].set_ylabel(r"$I/I_{\mathrm{max}}$ no máximo do pico")
+axes[1].set_title("Distribuição das intensidades de pico")
+fig.tight_layout()
+show_and_save(fig, "04_boxplot_violin_picos.png")
+"""))
+
+cells.append(code(r"""
+fig, ax = plt.subplots(figsize=(10.2, 4.5))
+for d in DOPINGS:
+    sub = peak_catalog[peak_catalog.nd_percent == d]
+    ax.scatter(sub.two_theta_deg, sub.scherrer_D_nm, s=42, color=PALETTE[d], label=f"{d}%", zorder=3)
+ax.set_xlabel(r"$2\theta$ (°)")
+ax.set_ylabel("D Scherrer (nm)")
+ax.set_title("Scherrer pico a pico — se D cair com 2θ, o strain/instrumento pesa")
+ax.legend(ncol=5)
+fig.tight_layout()
+show_and_save(fig, "04_scherrer_por_pico.png")
+"""))
+
+cells.append(code(r"""
+fig, axes = plt.subplots(1, 5, figsize=(14.8, 3.4), sharey=True)
+for ax, d in zip(axes, DOPINGS):
+    wh = wh_fits[d]
+    ax.set_title(f"{d}% Nd")
+    if wh is None:
+        ax.text(0.5, 0.5, "poucos picos", ha="center", va="center", transform=ax.transAxes)
+        continue
+    ax.scatter(wh["x"], wh["y"], color=PALETTE[d], s=36, zorder=3)
+    xx = np.linspace(wh["x"].min(), wh["x"].max(), 50)
+    ax.plot(xx, wh["intercept"] + wh["strain"] * xx, color="#333", lw=1)
+    dlab = "—" if not (wh["D_nm"] == wh["D_nm"]) else f"{wh['D_nm']:.1f} nm"
+    ax.set_xlabel(r"$4\sin\theta$")
+    ax.text(0.04, 0.95, f"D≈{dlab}\nε≈{wh['strain']:.4f}\nr={wh['r']:.2f}",
+            transform=ax.transAxes, va="top", fontsize=8)
+axes[0].set_ylabel(r"$\beta\cos\theta$")
+fig.suptitle("Williamson–Hall (UDM) por amostra — β = FWHM, sem correção instrumental", y=1.08)
+fig.tight_layout()
+show_and_save(fig, "04_williamson_hall.png")
+"""))
+
+cells.append(code(r"""
+fig, ax = plt.subplots(figsize=(6.4, 5.2))
+sc = ax.scatter(
+    features.wh_strain, features.wh_D_nm,
+    c=features.nd_percent, cmap="cividis", s=90, zorder=3, edgecolors="#333",
+)
+for _, row in features.iterrows():
+    ax.annotate(f"{int(row.nd_percent)}%", (row.wh_strain, row.wh_D_nm),
+                textcoords="offset points", xytext=(6, 4), fontsize=9)
+ax.set_xlabel(r"microstrain $\varepsilon$ (WH)")
+ax.set_ylabel("D WH (nm)")
+ax.set_title("Cristalito × strain (um ponto por amostra)")
+fig.colorbar(sc, ax=ax, label="Nd (%)")
+fig.tight_layout()
+show_and_save(fig, "04_D_vs_strain.png")
+"""))
+
+cells.append(code(r"""
+# Estatística entre amostras nas features (n=5: correlação é indicativa, não teste poderoso)
+num = feature_view.drop(columns=["n_points"]).select_dtypes(include=[np.number])
+corr_f = num.corr()
+fig, ax = plt.subplots(figsize=(9.2, 7.2))
+sns.heatmap(corr_f, cmap="vlag", center=0, annot=False, ax=ax)
+ax.set_title("Correlação entre características (5 amostras)")
+fig.tight_layout()
+show_and_save(fig, "04_corr_features.png")
+
+print("Pearson de cada feature com a % Nd (n=5):\n")
+for col in num.columns:
+    if col == "nd_percent":
+        continue
+    r, p = pearsonr(num[col].fillna(num[col].median()), num["nd_percent"])
+    print(f"  {col:22s}  r = {r:+.3f}   p = {p:.3f}")
 """))
 
 cells.append(md(r"""
-Nem toda coluna da tabela “é física da dopagem”. `n_points` depende do arquivo, não de $x$. `i_max_raw` mistura física e configuração do detector. `scherrer_D_nm` herda o FWHM e as hipóteses de Scherrer. O cientista escolhe o que entra no modelo; o algoritmo não faz essa crítica sozinho.
+Nem toda coluna “é física da dopagem”. `n_points` é artefato do arquivo. `i_max_raw` mistura detector e amostra. Scherrer e WH herdam o FWHM e a ausência de $\beta_{\mathrm{inst}}$. Intercepto WH **negativo** ⇒ $D$ indefinido: o instrumento ou o strain dominam o alargamento. O cientista escolhe o que entra no modelo.
 """))
 
 cells.append(md(r"""
@@ -673,11 +987,12 @@ Com **cinco amostras reais**, um teste de 20% teria **um** ponto. Qualquer $R^2$
 
 Comparamos sempre **ajuste in-sample** versus **LOO**. A diferença é a cara do overfitting.
 
-## 5.4 Modelos
+## 5.4 Quatro modelos (pelo menos três, como na edição anterior)
 
-- **Regressão linear** — hiperplano; fácil de superajustar se $p \approx n$.
-- **Ridge** — linear com penalização $\ell_2$ nos coeficientes (mais estável).
-- **Random Forest** — flexível; com $n=5$ memoriza com facilidade.
+- **Regressão linear** — hiperplano; $p \approx n$ é perigoso.
+- **k-NN** ($k=2$) — prediz pela média dos vizinhos no espaço de features.
+- **SVR (RBF)** — superfície suave; com $n=5$ também memoriza.
+- **Random Forest** — flexível; o exemplo clássico de overfitting neste dataset.
 """))
 
 cells.append(code(r"""
@@ -694,6 +1009,9 @@ X_cols = [
     "std_norm",
     "skew_norm",
     "scherrer_D_nm",
+    "scherrer_D_mean_nm",
+    "wh_D_nm",
+    "wh_strain",
 ]
 
 X = feature_view[X_cols].to_numpy(dtype=float)
@@ -702,6 +1020,7 @@ y = feature_view[TARGET].to_numpy(dtype=float)
 # Se FWHM/Scherrer vier NaN (pico não encontrado), imputamos a média da coluna.
 # Com n=5 isso é frágil — e deve aparecer no relatório.
 col_mean = np.nanmean(X, axis=0)
+col_mean = np.where(np.isfinite(col_mean), col_mean, 0.0)
 inds = np.where(np.isnan(X))
 X[inds] = np.take(col_mean, inds[1])
 
@@ -736,7 +1055,8 @@ results = []
 preds = {}
 for name, est in [
     ("Regressão linear", LinearRegression()),
-    ("Ridge", Ridge(alpha=1.0)),
+    ("k-NN (k=2)", KNeighborsRegressor(n_neighbors=2)),
+    ("SVR (RBF)", SVR(kernel="rbf", C=10.0, gamma="scale")),
     ("Random Forest", RandomForestRegressor(n_estimators=200, random_state=42, max_depth=3)),
 ]:
     m, y_in, y_loo, fitted = eval_model(name, est)
@@ -766,7 +1086,24 @@ for ax, mode in zip(axes, ["ajuste", "LOO"]):
 axes[1].legend(loc="upper left", fontsize=9)
 fig.suptitle("Overfitting: o ajuste “bonito” à esquerda não precisa sobreviver ao LOO", y=1.03)
 fig.tight_layout()
-plt.show()
+show_and_save(fig, "05_ajuste_vs_loo.png")
+"""))
+
+cells.append(code(r"""
+fig, axes = plt.subplots(1, 3, figsize=(13.0, 3.8))
+metrics_df[["R2_ajuste", "R2_LOO"]].plot(kind="bar", ax=axes[0], color=["#0072B2", "#D55E00"], rot=20)
+axes[0].set_title("R²")
+axes[0].axhline(0, color="0.5", lw=0.8)
+metrics_df[["MAE_ajuste", "MAE_LOO"]].plot(kind="bar", ax=axes[1], color=["#0072B2", "#D55E00"], rot=20)
+axes[1].set_title("MAE (p.p. de Nd)")
+metrics_df[["RMSE_ajuste", "RMSE_LOO"]].plot(kind="bar", ax=axes[2], color=["#0072B2", "#D55E00"], rot=20)
+axes[2].set_title("RMSE (p.p. de Nd)")
+for ax in axes:
+    ax.set_xlabel("")
+    ax.legend(fontsize=8)
+fig.suptitle("Quatro modelos — ajuste vs Leave-One-Out", y=1.05)
+fig.tight_layout()
+show_and_save(fig, "05_metricas_barras.png")
 """))
 
 cells.append(code(r"""
@@ -825,7 +1162,7 @@ ax.set_ylabel("Nd predito")
 ax.set_title("RF em dados sintéticos — didático, não é validação experimental")
 ax.set_aspect("equal")
 fig.tight_layout()
-plt.show()
+show_and_save(fig, "05_sintetico.png")
 """))
 
 cells.append(md(r"""
@@ -863,6 +1200,8 @@ dossie = {
         for nome, df in ((f"Nd_{d}", patterns[d]) for d in DOPINGS)
     },
     "caracteristicas": feature_view.round(4).to_dict(orient="records"),
+    "n_registros_de_pico": int(len(peak_catalog)),
+    "williamson_hall": feature_view[["nd_percent", "wh_D_nm", "wh_strain", "wh_r", "wh_n"]].round(4).to_dict(orient="records"),
     "ml_loo": metrics_df.reset_index().to_dict(orient="records"),
     "previsoes_LOO": {
         name: {"real": y.tolist(), "predito": np.round(blob["LOO"], 3).tolist()}
@@ -874,7 +1213,7 @@ dossie = {
     },
     "instrucoes_ao_llm": [
         "Não invente números que não estejam neste JSON.",
-        "Deixe claro que o LLM não calculou FWHM, Scherrer nem as métricas.",
+        "Deixe claro que o LLM não calculou FWHM, Scherrer, Williamson-Hall nem as métricas.",
         "Discuta overfitting e o regime n=5.",
         "Escreva em português, tom de relatório científico de minicurso (não paper Nature).",
     ],
@@ -886,7 +1225,7 @@ print(json.dumps({k: dossie[k] for k in ["material", "n_amostras_reais", "ml_loo
 cells.append(code(r"""
 SYSTEM = (
     "Você é um copiloto científico em um minicurso de Física/ciência de dados. "
-    "Você NÃO calcula difração, FWHM, Scherrer nem métricas de ML. "
+    "Você NÃO calcula difração, FWHM, Scherrer, Williamson-Hall nem métricas de ML. "
     "Você apenas interpreta o JSON fornecido pelo pipeline verificável. "
     "Se algo não estiver no JSON, diga que não consta. "
     "Estruture a resposta em: (1) dados e pré-processamento, (2) características físicas, "
@@ -911,7 +1250,8 @@ def relatorio_local(dossie: dict) -> str:
         linhas.append(
             f"- {rec['nd_percent']}% Nd: pico principal em {rec['two_theta_max']}°, "
             f"FWHM {rec['fwhm_main_deg']}°, n_picos={rec['n_peaks']}, "
-            f"D(Scherrer)≈{rec['scherrer_D_nm']} nm."
+            f"D(Scherrer)≈{rec.get('scherrer_D_nm')} nm, "
+            f"D(WH)≈{rec.get('wh_D_nm')} nm, strain≈{rec.get('wh_strain')}."
         )
     linhas += ["", "## Machine Learning (Leave-One-Out)"]
     for nome, row in loo.items():
@@ -1042,6 +1382,7 @@ def run_hybrid_pipeline(dopings=DOPINGS):
     X_loc = view[X_cols].to_numpy(dtype=float)
     y_loc = view[TARGET].to_numpy(dtype=float)
     col_m = np.nanmean(X_loc, axis=0)
+    col_m = np.where(np.isfinite(col_m), col_m, 0.0)
     nan_at = np.where(np.isnan(X_loc))
     X_loc[nan_at] = np.take(col_m, nan_at[1])
 
@@ -1104,14 +1445,14 @@ O minicurso percorreu:
 1. o conceito de IA científica e a divisão de papéis (algoritmo vs. LLM);
 2. dados reais de DRX de $\mathrm{Bi}_{1-x}\mathrm{Nd}_{x}\mathrm{FeO}_{3}$;
 3. pré-processamento reproduzível;
-4. características com leitura física;
-5. regressão honesta em base pequena (LOO, overfitting, sintéticos com ressalva);
+4. características, Scherrer e Williamson–Hall (cristalito e strain);
+5. quatro modelos de regressão, LOO, overfitting, sintéticos com ressalva;
 6. LLM como redator/copiloto;
 7. o pipeline inteiro em um único fluxo.
 
 **Para levar para casa:** se o número não saiu de uma célula de cálculo, ele não entra no artigo — nem quando a frase do LLM estiver convincente.
 
-Material de apoio: `docs/MANUAL.md` (como usar Colab, GitHub e a chave do LLM) e `slides/` (apresentação por módulo).
+Material de apoio: [`docs/MANUAL.md`](../docs/MANUAL.md) e slides em https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html
 """))
 
 nb = {

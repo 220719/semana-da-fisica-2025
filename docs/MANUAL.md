@@ -8,7 +8,7 @@ Material:
 |---|---|
 | Aula prática | [`notebooks/Minicurso_IA_Cientifica_DRX.ipynb`](../notebooks/Minicurso_IA_Cientifica_DRX.ipynb) |
 | Slides (por módulo) | [`slides/index.html`](../slides/index.html) |
-| Apresentação completa | [`slides/apresentacao.html`](../slides/apresentacao.html) |
+| Apresentação (GitHub Pages) | https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html |
 | Difratogramas | [`data/Nd_10.csv`](../data/Nd_10.csv) … `Nd_50.csv` |
 
 Não é necessário instalar Python no computador. O caminho oficial da turma é o **Google Colab**.
@@ -93,7 +93,7 @@ A turma **não** precisa deste caminho C.
 1. Ambiente de execução → **Alterar o tipo de ambiente** → CPU → Salvar.
 2. Execute em ordem: *Ambiente de execução → Executar tudo* (`Ctrl+F9` / `Cmd+F9`).
 3. Se uma célula falhar, **não pule**: as seguintes dependem das variáveis anteriores (`patterns`, `processed`, `features`…).
-4. Figuras aparecem abaixo da célula. Para salvar: clique com o botão direito na imagem → salvar, ou `fig.savefig("figura.png", dpi=150)` numa célula nova.
+4. Figuras também vão para a pasta `figuras/` da sessão (ícone de pasta à esquerda → download dos PNG).
 5. A sessão do Colab **expira** (ociosidade ~90 min). O trabalho não fica salvo no GitHub automaticamente. Use *Arquivo → Salvar uma cópia no Drive* se quiser levar o notebook anotado para casa.
 
 ### Problemas frequentes
@@ -119,14 +119,18 @@ Não envie os CSV para um LLM “para ele analisar o espectro”. O pipeline Pyt
 
 ## 5. Slides (Reveal.js)
 
-1. Baixe o repositório (ZIP no GitHub: *Code → Download ZIP*) **ou** clone.
-2. Abra `slides/index.html` no Chrome/Edge/Firefox.
-3. Para a palestra contínua: `slides/apresentacao.html`.
-4. Teclado: setas, `F` tela cheia, `Esc` visão geral, `S` modo apresentador (se o Reveal carregar o plugin; neste pacote usamos navegação simples).
+Caminho mais prático — **não precisa clonar**:
 
-Os slides puxam o Reveal.js de um CDN. É preciso **internet** na primeira abertura. Não instale nada.
+- Apresentação completa: https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html
+- Um HTML por módulo: https://220719.github.io/semana-da-fisica-2025/slides/index.html
 
-Os PDFs antigos em `docs/Parte1.pdf` e `docs/Parte2.pdf` (se existirem no clone) são da **edição anterior** do minicurso.
+Se o Pages ainda não estiver ativo no repositório: GitHub → *Settings → Pages → Deploy from a branch* → `main` → `/ (root)`.
+
+Alternativa offline: ZIP do repositório e abrir `slides/apresentacao.html` no Chrome (precisa de internet para o CDN do Reveal.js).
+
+Teclado: setas, `F` tela cheia, `Esc` visão geral.
+
+Os PDFs antigos em `docs/Parte1.pdf` e `docs/Parte2.pdf` (se existirem no clone) são da **edição anterior**.
 
 ---
 

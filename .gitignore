@@ -25,6 +25,9 @@ dist/
 build/
 *.egg-info/
 
+# Figuras geradas ao rodar o notebook
+figuras/
+
 # Data outputs (keep raw data, ignore generated)
 *.pkl
 *.h5

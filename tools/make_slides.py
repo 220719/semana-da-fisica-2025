@@ -219,9 +219,19 @@ M4 = [
         "<p>É ordem de grandeza, <strong>não</strong> Rietveld. Não separa alargamento instrumental nem microdeformação.</p>",
     ),
     sec(
-        "<h2>Williamson–Hall (fora da aula)</h2>",
-        "<p>A edição anterior misturava arquivos .asc e um β inconsistente (D ~ 0,1 nm).</p>",
-        "<p>WH exige β por pico, correção instrumental e uma série de 2θ. Deixamos como extensão.</p>",
+        "<h2>Williamson–Hall (UDM)</h2>",
+        r"<p>\[ \beta\cos\theta = K\lambda/D + 4\varepsilon\sin\theta \]</p>",
+        "<ul>",
+        "<li>Intercepto → tamanho aparente de cristalito D.</li>",
+        "<li>Declive → microstrain ε.</li>",
+        "<li>β = FWHM de cada pico (não a derivada da intensidade).</li>",
+        "<li>Sem padrão interno: D e ε incluem o instrumento.</li>",
+        "</ul>",
+    ),
+    sec(
+        "<h2>Catálogo de picos</h2>",
+        "<p>Cada pico é um registro: 2θ, I, FWHM, d<sub>hkl</sub>, D(Scherrer).</p>",
+        "<p>Cinco CSV viram dezenas de linhas — o máximo de “amostras internas” sem inventar experimento.</p>",
     ),
 ]
 
@@ -257,7 +267,8 @@ M5 = [
         "<h2>Modelos na aula</h2>",
         "<ul>",
         "<li>Linear — hiperplano; p ≈ n é perigoso.</li>",
-        "<li>Ridge — penalização ℓ₂, mais estável.</li>",
+        "<li>k-NN (k = 2) — média dos vizinhos.</li>",
+        "<li>SVR (RBF) — superfície suave.</li>",
         "<li>Random Forest — flexível; com n = 5 memoriza.</li>",
         "</ul>",
     ),

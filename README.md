@@ -16,7 +16,7 @@ Minicurso teórico-prático no **Google Colab**: pipeline verificável de DRX + 
 1. Abra o notebook no Colab pelo badge acima (CPU).
 2. *Ambiente de execução → Executar tudo*.
 3. Leia o [manual das ferramentas](docs/MANUAL.md) (Colab, clone, slides, chave do LLM).
-4. Slides: [slides/index.html](slides/index.html) (abra no navegador) ou a [apresentação completa](slides/apresentacao.html).
+4. Slides no navegador (sem baixar ZIP): [apresentação](https://220719.github.io/semana-da-fisica-2025/slides/apresentacao.html) · [índice](https://220719.github.io/semana-da-fisica-2025/slides/index.html)
 
 Não é necessário instalar Python, montar Google Drive nem fazer upload dos CSV: o notebook lê a pasta `data/` ou baixa do GitHub.
 
@@ -29,8 +29,8 @@ Não é necessário instalar Python, montar Google Drive nem fazer upload dos CS
 | 1 | O que é IA científica · ML × DL × LLM · pipeline híbrido |
 | 2 | Arquivos de DRX, leitura correta, waterfall e mapa de intensidade |
 | 3 | Savitzky–Golay, linha de base ALS, normalização |
-| 4 | Features com significado físico (picos, FWHM, Scherrer) |
-| 5 | Regressão, LOO, R² / MAE / RMSE, overfitting, dados sintéticos |
+| 4 | Picos, FWHM, Scherrer, Williamson–Hall (cristalito e strain), estatística |
+| 5 | Linear, k-NN, SVR e Random Forest · LOO · overfitting |
 | 6 | LLM como copiloto (Gemini/OpenAI opcional; fallback local) |
 | 7 | Função única: do CSV ao relatório |
 
@@ -65,8 +65,8 @@ No Colab, o equivalente é uma célula `!git clone ...` — detalhes no manual.
 - CSV **sem cabeçalho** (`header=None`): a versão antiga descartava o primeiro ponto.
 - Sem dependência de Google Drive.
 - Validação de ML por **Leave-One-Out** (com n = 5, split 80/20 não faz sentido).
-- Scherrer como estimativa didática; Williamson–Hall inconsistente da edição anterior ficou de fora do caminho principal.
-- Gráficos: paleta distinguível, waterfall, mapa 2θ × dopagem, FWHM desenhado na meia-altura.
+- Scherrer **e** Williamson–Hall com β = FWHM de cada pico (a edição antiga usava um β da derivada da intensidade e gerava D ~ 0,1 nm).
+- Gráficos: waterfall, mapa 2θ × dopagem, correlação/RMSE, histograma, boxplot/violin, WH, métricas em barras; PNGs em `figuras/` ao rodar o notebook.
 - LLM só interpreta um JSON produzido pelo pipeline.
 
 O notebook legado `notebooks/DRX_Analises.ipynb` (se presente) é histórico.
